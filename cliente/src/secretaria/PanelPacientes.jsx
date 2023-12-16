@@ -7,7 +7,7 @@ function PanelPacientes() {
       <div className="py-20 px-16 rounded-xl shadow-2xl bg-white bg-clip-border">
         <h1 className="text-3xl font-bold mb-14 text-blue-500 text-center">Panel de Pacientes</h1>
         <div className="flex items-center justify-center space-x-8">
-        <Link to="/pacientes/listado">
+        <Link to="/pacientes/lista">
             <button className="text-2xl bg-blue-500 hover:bg-blue-700 text-white font-semibold rounded-xl py-12 px-12">
             Listado de Pacientes
             </button>

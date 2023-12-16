@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 
-const Citas = () => {
+const ListaCitas = () => {
   const [citas, setCitas] = useState([]);
 
   useEffect(() => {
@@ -97,4 +97,4 @@ const Citas = () => {
   );
 };
 
-export default Citas;
+export default ListaCitas;
