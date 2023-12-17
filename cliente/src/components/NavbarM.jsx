@@ -12,10 +12,10 @@ const NavBarM = () => {
             <Link to="/medico" className='h-full w-full flex items-center hover:text-white'>Inicio</Link>
           </li>
           <li className='p-4 hover:bg-blue-200 transition duration-300 rounded-2xl'>
-            <Link to="historial-medico" className='h-full w-full flex items-center hover:text-white'>Pacientes</Link>
+            <Link to="diagnostico" className='h-full w-full flex items-center hover:text-white'>Diagnostico</Link>
           </li>
           <li className='p-4 hover:bg-blue-200 transition duration-300 rounded-2xl'>
-            <Link to="medicamentos-medico" className='hover:text-white'>Medicamentos</Link>
+            <Link to="medicamentos" className='hover:text-white'>Medicamentos</Link>
           </li>
      
         </ul>

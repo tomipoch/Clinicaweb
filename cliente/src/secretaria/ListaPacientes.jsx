@@ -1,146 +1,206 @@
 import React, { useState, useEffect } from "react";
-import axiosInstance from "../config/axiosConfig";
+const CitasMedico = () => {
+  const [citas, setCitas] = useState([]);
+  const [citasEditando, setCitasEditando] = useState({
+    id: null,
+    nombre: '',
+    apellido: '',
+    email: '',
+    ciudad: '',
+    telefono: '',
+    mensaje: '',
+    index: null,
+  });
 
-// Función que no hace nada
-function handleEdit(contactId) {
-  console.log("Editar contacto con ID:", contactId);
-}
+  const agregarCita = () => {
+    const nuevaCita = {
+      id: citas.length + 1, // Usar un ID único
+      nombre: 'Matias',
+      apellido: 'Varas',
+      email: 'xxx@gmail.com',
+      ciudad: 'talca',
+      telefono: '9898999',
+      mensaje: 'Mensaje de clinica oftalmologica',
+    };
 
-// Función que no hace nada
-function handleSelect(contactId) {
-  console.log("Seleccionar contacto con ID:", contactId);
-}
+    setCitas([...citas, nuevaCita]);
+  };
 
-const ListaPacientes = () => {
-  const [contacts, setContacts] = useState([]);
+  const editarCitas = (index) => {
+    const citaEnEdicion = citas[index];
+    setCitasEditando({ ...citaEnEdicion, index });
+  };
 
-  useEffect(() => {
-    // Realiza una solicitud GET cuando el componente se monta
+  const manejarCambioCampo = (campo, valor) => {
+    setCitasEditando((prevCitasEditando) => ({
+      ...prevCitasEditando,
+      [campo]: valor,
+    }));
+  };
 
-    axiosInstance
-      .get("/secretaria/pacientes")
-      .then((response) => {
-        console.log("response", response.data);
-        // Asegúrate de que la respuesta sea un arreglo
-        if (Array.isArray(response.data)) {
-          setContacts(response.data);
-        } else {
-          // Si no, manejar la ausencia de un arreglo
-          console.error("La respuesta no es un arreglo");
-          setContacts([]); // Puedes establecer un estado vacío o manejar como veas conveniente
-        }
-      })
-      .catch((error) => {
-        // Manejar el error
-        console.error("Error al obtener datos:", error);
-        setContacts([]); // En caso de error, establece un arreglo vacío
-      });
-  }, []);
+  const guardarEdicion = () => {
+    const nuevaCita = [...citas];
+    nuevaCita[citasEditando.index] = { ...citasEditando };
+    setCitas(nuevaCita);
+    cancelarEdicion();
+  };
 
-  function handleEdit(contactId) {
-    // Abre un modal o redirige a la página de edición pasando el ID del paciente
-    console.log("Editar contacto con ID:", contactId);
-    // Puedes usar una biblioteca de modales o React Router para implementar esta funcionalidad.
-  }
+  const cancelarEdicion = () => {
+    setCitasEditando({
+      id: null,
+      nombre: '',
+      apellido: '',
+      email: '',
+      ciudad: '',
+      telefono: '',
+      mensaje: '',
+      index: null,
+    });
+  };
 
-  function handleSelect(contactId) {
-    // Actualiza el estado del paciente seleccionado
-    console.log("Seleccionar contacto con ID:", contactId);
-    // Puedes usar un estado de React para almacenar el paciente seleccionado.
-  }
-
-  function handleDelete(contactId) {
-    // Realiza una solicitud DELETE al servidor para eliminar el paciente con el ID contactId
-    const rut = contacts[contactId][0];
-    // Luego de eliminarlo con éxito, puedes actualizar la lista de pacientes
-    axiosInstance
-      .delete(`/secretaria/pacientes/`, { data: { rut: rut } })
-      .then((response) => {
-        // Actualiza la lista de pacientes después de la eliminación
-        const updatedContacts = contacts.filter(
-          (contact, index) => index !== contactId
-        );
-        setContacts(updatedContacts);
-      })
-      .catch((error) => {
-        console.error("Error al eliminar paciente:", error);
-        // Maneja los errores de eliminación aquí
-      });
-  }
+  const eliminarCita = (index) => {
+    const nuevaCita = citas.filter((_, i) => i !== index);
+    setCitas(nuevaCita);
+    cancelarEdicion();
+  };
 
   return (
-    <div className="container mx-auto mt-20">
-      <table className="min-w-full divide-y divide-gray-200">
-        <thead className="bg-gray-50">
-          <tr>
-            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-              RUT
-            </th>
-            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-              Name
-            </th>
-            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-              Paternal Last Name
-            </th>
-            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-              Maternal Last Name
-            </th>
-            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-              Email
-            </th>
-            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-              Contact
-            </th>
-            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-              Actions
-            </th>
-          </tr>
-        </thead>
-        <tbody className="bg-white divide-y divide-gray-200">
-          {contacts.map((contact, index) => (
-            <tr key={index}>
-              <td className="px-6 py-4 whitespace-nowrap">{contact[0]}</td>
-              <td className="px-6 py-4 whitespace-nowrap">{contact[1]}</td>
-              <td className="px-6 py-4 whitespace-nowrap">{contact[2]}</td>
-              <td className="px-6 py-4 whitespace-nowrap">{contact[3]}</td>
-              <td className="px-6 py-4 whitespace-nowrap">
-                {new Date(contact[4]).toLocaleDateString("es-ES")}
+    <div className="flex justify-center items-center h-screen flex-col mt-1">
+      <h1 className="text-3xl text-blue-500 font-bold mb-8">Lista de Pacientes</h1>
+      <div className='flex flex-row gap-2'>
+        <button onClick={agregarCita} className='bg-green-500 text-white shadow-2xl shadow-green-500 flex items-center gap-2 py-2 px-4 mb-10 rounded-lg hover'>
+          Agregar
+        </button>
+      </div>
+      <div className="overflow-x-auto shadow-2xl shadow-blue-300 rounded-2xl">
+        <table className='w-full rounded-2xl table-auto'>
+          <thead className='bg-blue-500 text-white'>
+            <tr>
+              <th className='p-2'>ID</th>
+              <th className='p-2'>Nombre</th>
+              <th className='p-2'>Apellido</th>
+              <th className='p-2'>Email</th>
+              <th className='p-2'>Ciudad</th>
+              <th className='p-2'>Telefono</th>
+              <th className='p-2'>Mensaje</th>
+              <th className='p-2'>Acciones</th>
+            </tr>
+          </thead>
+          <tbody>
+            {citas.map((cita, index) => (
+              <tr key={index}>
+                <td className='p-2 bg-white text-blue-500'>
+                  {citasEditando.index === index ? (
+                    <input
+                      type='text'
+                      value={citasEditando.id}
+                      onChange={(e) => manejarCambioCampo('id', e.target.value)}
+                      className='p-2 w-full border rounded bg-transparent'
+                    />
+                  ) : (
+                    cita.id
+                )}
               </td>
-
-              <td className="px-6 py-4 whitespace-nowrap">{contact[5]}</td>
-              <td className="px-6 py-4 whitespace-nowrap">{contact[6]}</td>
-              <td className="px-6 py-4 whitespace-nowrap">
-                <button
-                  onClick={() => {
-                    handleEdit(index);
-                  }}
-                  className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
-                >
-                  Edit
-                </button>
-                <button
-                  onClick={() => {
-                    handleSelect(index);
-                  }}
-                  className="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded"
-                >
-                  Select
-                </button>
-                <button
-                  onClick={() => {
-                    handleDelete(index);
-                  }}
-                  className="bg-red-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded"
-                >
-                  Delete
-                </button>
+              <td className='p-2 bg-white text-blue-500'>
+                {citasEditando.index === index ? (
+                  <input
+                    type='text'
+                    value={citasEditando.nombre}
+                    onChange={(e) => manejarCambioCampo('nombre', e.target.value)}
+                    className='p-2 w-full border rounded bg-transparent'
+                  />
+                ) : (
+                  cita.nombre
+                )}
+              </td>
+              <td className='p-2 bg-white text-blue-500'>
+                {citasEditando.index === index ? (
+                  <input
+                    type='text'
+                    value={citasEditando.apellido}
+                    onChange={(e) => manejarCambioCampo('apellido', e.target.value)}
+                    className='p-2 w-full border rounded bg-transparent'
+                  />
+                ) : (
+                  cita.apellido
+                )}
+              </td>
+              <td className='p-2 bg-white text-blue-500'>
+                {citasEditando.index === index ? (
+                  <input
+                    type='text'
+                    value={citasEditando.email}
+                    onChange={(e) => manejarCambioCampo('email', e.target.value)}
+                    className='p-2 w-full border rounded bg-transparent'
+                  />
+                ) : (
+                  cita.email
+                )}
+              </td>
+              <td className='p-2 bg-white text-blue-500'>
+                {citasEditando.index === index ? (
+                  <input
+                    type='text'
+                    value={citasEditando.ciudad}
+                    onChange={(e) => manejarCambioCampo('ciudad', e.target.value)}
+                    className='p-2 w-full border rounded bg-transparent'
+                  />
+                ) : (
+                  cita.ciudad
+                )}
+              </td>
+              <td className='p-2 bg-white text-blue-500'>
+                {citasEditando.index === index ? (
+                  <input
+                    type='text'
+                    value={citasEditando.telefono}
+                    onChange={(e) => manejarCambioCampo('telefono', e.target.value)}
+                    className='p-2 w-full border rounded bg-transparent'
+                  />
+                ) : (
+                  cita.telefono
+                )}
+              </td>
+              <td className='p-2 bg-white text-blue-500'>
+                {citasEditando.index === index ? (
+                  <input
+                    type='text'
+                    value={citasEditando.mensaje}
+                    onChange={(e) => manejarCambioCampo('mensaje', e.target.value)}
+                    className='p-2 w-full border rounded bg-transparent'
+                  />
+                ) : (
+                  cita.mensaje
+                )}
+              </td>
+              <td className='p-2 bg-white flex justify-end'>
+                {citasEditando.index === index ? (
+                  <>
+                    <button className='bg-green-500 text-white py-1 px-2 rounded-lg mr-2' onClick={guardarEdicion}>
+                      Guardar
+                    </button>
+                    <button className='bg-gray-400 text-green py-1 px-2 rounded-lg ' onClick={cancelarEdicion}>
+                      Cancelar
+                    </button>
+                  </>
+                ) : (
+                  <>
+                    <button className='bg-blue-500 text-white py-1 px-2 rounded-lg mr-2 ' onClick={() => editarCitas(index)}>
+                      Editar
+                    </button>
+                    <button className='bg-red-500 text-white py-1 px-2 rounded-lg mr-2' onClick={() => eliminarCita(index)}>
+                       Eliminar
+                    </button>
+                  </>
+                )}
               </td>
             </tr>
           ))}
         </tbody>
       </table>
+      </div>
     </div>
   );
 };
 
-export default ListaPacientes;
+export default CitasMedico;

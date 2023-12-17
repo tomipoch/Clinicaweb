@@ -33,7 +33,7 @@ const Medicamentos = () => {
   return (
     <div className="flex flex-col justify-center items-center h-screen mt-1">
       <h1 className="text-3xl text-blue-500 font-bold mb-8">Medicamentos</h1>
-      <div className="w-full  rounded-2xl overflow-x-auto">
+      <div className="w-full  rounded-2xl shadow-xl shadow-blue-300 overflow-x-auto">
         <table className="w-full  rounded-2xl table-auto">
           <thead>
             <tr>

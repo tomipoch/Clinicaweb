@@ -24,7 +24,7 @@ import PanelMedico from "./medico/PanelMedico";
 import CitasMedico from "./medico/CitasMedico";
 import EquipoMedico from "./medico/EquipoMedico";
 import Medicamentos from "./medico/Medicamentos";
-import HistorialPacientes from "./medico/HistorialPacientes";
+import Diagnostico from "./medico/Diagnostico";
 
 function App() {
   return (
@@ -38,7 +38,7 @@ function App() {
           <Route path="pacientes" element={<PanelPacientes />} />
           <Route path="citas/lista" element={<ListaCitas />} />
           <Route path="citas/agendar" element={<AgendarCita />} />
-          <Route path="pacientes/listado" element={<ListaPacientes />} />
+          <Route path="pacientes/lista" element={<ListaPacientes />} />
           <Route path="pacientes/registro" element={<RegistroPaciente />} />
           <Route path="paciente/:id" element={<DetalleDePaciente />} />
           <Route path="horarios" element={<Horarios />} />
@@ -48,7 +48,7 @@ function App() {
           <Route index element={<PanelMedico/>} />
           <Route path="citas-medico" element={<CitasMedico/>} />
           <Route path="equipo-medico" element={<EquipoMedico/>} />
-          <Route path="historial-pacientes" element={<HistorialPacientes/>} />
+          <Route path="diagnostico" element={<Diagnostico/>} />
           <Route path="medicamentos" element={<Medicamentos/>} />
         </Route>
       </Routes>
