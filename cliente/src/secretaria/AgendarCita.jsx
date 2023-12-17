@@ -2,56 +2,53 @@ import React, { useState, useEffect } from "react";
 import axiosInstance from "../config/axiosConfig";
 
 const AgendarCita = () => {
-  useEffect(() => {
-    // Eliminé la carga de Google Fonts
-  }, []);
-
   const [rutPaciente, setRutPaciente] = useState("");
-  const [nombrePaciente, setNombrePaciente] = useState("");
-  const [apellidoPaternoPaciente, setApellidoPaternoPaciente] = useState("");
-  const [apellidoMaternoPaciente, setApellidoMaternoPaciente] = useState("");
-  const [contactoPaciente, setContactoPaciente] = useState("");
-  const [selectedMedico, setSelectedMedico] = useState(""); // Estado para el médico seleccionado
-  const [medicos, setMedicos] = useState([]); // Estado para la lista de médicos disponibles
+  const [selectedMedico, setSelectedMedico] = useState("");
+  const [medicos, setMedicos] = useState([]);
   const [fecha, setFecha] = useState("");
   const [hora, setHora] = useState("");
 
   useEffect(() => {
-    // Obtener la lista de médicos disponibles al cargar el componente
     axiosInstance
-      .get("/medicos") // Reemplaza con la ruta correcta para obtener médicos
+      .get("/medicos")
       .then((response) => {
-        setMedicos(response.data);
+        // Asegúrate de que el backend envía un array de objetos con las propiedades idMedico y nombreCompleto
+        setMedicos(
+          response.data.map((medico) => ({
+            idMedico: medico.idMedico, // Suponiendo que el backend envía COD_MEDICO
+            nombreCompleto: medico.nombreCompleto,
+          }))
+        );
       })
       .catch((error) => {
         console.error("Error al obtener la lista de médicos:", error);
       });
   }, []);
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    // Agrega aquí la lógica para enviar los datos a tu servidor o realizar la acción correspondiente.
-    console.log("Valores de los campos:");
-    console.log("Rut Paciente:", rutPaciente, typeof rutPaciente);
-    console.log("Nombre Paciente:", nombrePaciente, typeof nombrePaciente);
-    console.log(
-      "Apellido Paterno Paciente:",
-      apellidoPaternoPaciente,
-      typeof apellidoPaternoPaciente
-    );
-    console.log(
-      "Apellido Materno Paciente:",
-      apellidoMaternoPaciente,
-      typeof apellidoMaternoPaciente
-    );
-    console.log(
-      "Contacto Paciente:",
-      contactoPaciente,
-      typeof contactoPaciente
-    );
-    console.log("Médico Seleccionado:", selectedMedico, typeof selectedMedico);
-    console.log("Fecha:", fecha, typeof fecha);
-    console.log("Hora:", hora, typeof hora);
+  const handleSubmit = (event) => {
+    event.preventDefault();
+    // Enviar los datos de la cita al backend usando Axios
+    const dataToSend = {
+      rutPaciente: rutPaciente,
+      idMedico: selectedMedico, // Asegúrate de que este sea el COD_MEDICO del médico seleccionado
+      fecha: fecha,
+      hora: hora,
+    };
+
+    axiosInstance
+      .post("/agendar-cita", dataToSend) // Ajusta la ruta del backend según tus necesidades
+      .then((response) => {
+        // Manejar la respuesta del backend, por ejemplo, mostrar un mensaje de éxito
+        console.log("Cita agendada con éxito");
+        // Limpiar el formulario
+        setRutPaciente("");
+        setSelectedMedico("");
+        setFecha("");
+        setHora("");
+      })
+      .catch((error) => {
+        console.error("Error al agendar la cita:", error);
+      });
   };
 
   const renderInput = (
@@ -77,7 +74,7 @@ const AgendarCita = () => {
 
   return (
     <div className="mt-20">
-      <div className="bg-white rounded-xl flex flex-col items-center justify-center w-3/5 mx-auto p-14 shadow-md mt-4 mb-4">
+      <div className="bg-white rounded-xl flex flex-col items-center justify-center w-3/5 mx-auto p-14 shadow-2xl shadow-blue-200 mt-4 mb-4">
         <h2 className="text-blue-500 font-bold text-3xl mb-5">Agendar Citas</h2>
         <form
           onSubmit={handleSubmit}
@@ -92,33 +89,8 @@ const AgendarCita = () => {
               "text",
               true
             )}
-            {renderInput(
-              "Nombre Paciente:",
-              nombrePaciente,
-              setNombrePaciente,
-              "text"
-            )}
-            {renderInput(
-              "Apellido Paterno:",
-              apellidoPaternoPaciente,
-              setApellidoPaternoPaciente,
-              "text"
-            )}
-            {renderInput(
-              "Apellido Materno:",
-              apellidoMaternoPaciente,
-              setApellidoMaternoPaciente,
-              "text"
-            )}
-            {renderInput(
-              "Contacto Paciente:",
-              contactoPaciente,
-              setContactoPaciente,
-              "text"
-            )}
           </div>
-
-          {/* Columna 2 */}
+          
           <div className="w-full md:w-1/2 lg:w-1/3 xl:w-1/4 mb-4 md:mb-0">
             <div className="mb-3">
               <label className="block text-blue-500 font-semibold">
@@ -128,12 +100,11 @@ const AgendarCita = () => {
                 value={selectedMedico}
                 onChange={(e) => setSelectedMedico(e.target.value)}
                 className="bg-blue-100 text-blue-500 rounded-md p-2 w-full"
-                required
               >
                 <option value="">Seleccione un médico</option>
                 {medicos.map((medico) => (
-                  <option key={medico.id} value={medico.id}>
-                    {medico.nombre} {medico.apellido}
+                  <option key={medico.idMedico} value={medico.idMedico}>
+                    {medico.nombreCompleto}
                   </option>
                 ))}
               </select>
@@ -145,10 +116,10 @@ const AgendarCita = () => {
             {renderInput("Fecha:", fecha, setFecha, "date", true)}
             {renderInput("Hora:", hora, setHora, "time", true)}
             <button
-              type="submit"
-              className="bg-green-500 hover:bg-green-700 text-white font-bold rounded-md p-2 w-full"
+            type="submit"
+            className="bg-blue-500 hover:bg-blue-700 text-white font-bold rounded-md p-2 w-full"
             >
-              Agendar Cita
+            Agendar Cita
             </button>
           </div>
         </form>

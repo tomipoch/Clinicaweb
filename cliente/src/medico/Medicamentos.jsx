@@ -1,45 +1,42 @@
 import React, { useState, useEffect } from "react";
 import axiosInstance from "../config/axiosConfig";
 
-function handleEdit(contactId) {
-  console.log("Editar contacto con ID:", contactId);
-}
-
-function handleSelect(contactId) {
-  console.log("Seleccionar contacto con ID:", contactId);
-}
-
 const Medicamentos = () => {
-  const [contacts, setContacts] = useState([]);
+  const [medicamentos, setMedicamentos] = useState([]);
 
   useEffect(() => {
     axiosInstance
       .get("/medicamentos")
       .then((response) => {
         if (Array.isArray(response.data)) {
-          setContacts(response.data);
+          // Reemplaza valores null y da formato a los datos
+          const formattedData = response.data.map(
+            ([id, codigo = "", nombre, disponibilidad]) => ({
+              id,
+              codigo: codigo || "No disponible",
+              nombre,
+              disponibilidad,
+            })
+          );
+          setMedicamentos(formattedData);
         } else {
           console.error("La respuesta no es un arreglo");
-          setContacts([]);
+          setMedicamentos([]);
         }
       })
       .catch((error) => {
         console.error("Error al obtener datos:", error);
-        setContacts([]);
+        setMedicamentos([]);
       });
   }, []);
-
 
   return (
     <div className="flex flex-col justify-center items-center h-screen mt-1">
       <h1 className="text-3xl text-blue-500 font-bold mb-8">Medicamentos</h1>
-      <div className="w-full  rounded-2xl shadow-xl shadow-blue-300 overflow-x-auto">
-        <table className="w-full  rounded-2xl table-auto">
+      <div className="w-full rounded-2xl shadow-2xl shadow-blue-200 overflow-x-auto">
+        <table className="min-w-full leading-normal rouunded-2xl bg-white border border-gray-200">
           <thead>
             <tr>
-              <th className="px-5 py-3 border-b-2 border-blue-500 text-left text-xs font-semibold text-white bg-blue-500 tracking-wider">
-                ID
-              </th>
               <th className="px-5 py-3 border-b-2 border-blue-500 text-left text-xs font-semibold text-white bg-blue-500 tracking-wider">
                 Código de medicamento
               </th>
@@ -49,37 +46,28 @@ const Medicamentos = () => {
               <th className="px-5 py-3 border-b-2 border-blue-500 text-left text-xs font-semibold text-white bg-blue-500 tracking-wider">
                 Disponibilidad
               </th>
-              <th className="px-5 py-3 border-b-2 border-blue-500 text-left text-xs font-semibold text-white bg-blue-500 tracking-wider">
-                Valor
-              </th>
             </tr>
           </thead>
           <tbody>
-            {contacts.length > 0 ? (
-              contacts.map((contact) => (
-                <tr key={contact.id}>
-                  <td className="px-6 py-4 border-b border-blue-100 whitespace-nowrap text-sm font-medium text-gray-900">
-                    {cita.id}
+            {medicamentos.length > 0 ? (
+              medicamentos.map((medicamento) => (
+                <tr key={medicamento.id}>
+                  <td className="px-6 py-4 border-b border-blue-100 whitespace-nowrap text-sm font-medium bg-white text-blue-500">
+                    {medicamento.id}
                   </td>
-                  <td className="px-6 py-4 border-b border-blue-100 whitespace-nowrap text-sm font-medium text-gray-900">
-                    {contact.codigodemedicamento}
+                  <td className="px-6 py-4 border-b border-blue-100 whitespace-nowrap text-sm font-medium bg-white text-blue-500">
+                    {medicamento.nombre}
                   </td>
-                  <td className="px-6 py-4 border-b border-blue-100 whitespace-nowrap text-sm font-medium text-gray-900">
-                    {contact.nombredelmedicamento}
-                  </td>
-                  <td className="px-6 py-4 border-b border-blue-100 whitespace-nowrap text-sm font-medium text-gray-900">
-                    {contact.disponibilidad}
-                  </td>
-                  <td className="px-6 py-4 border-b border-blue-100 whitespace-nowrap text-sm font-medium text-gray-900">
-                    {contact.valor}
+                  <td className="px-6 py-4 border-b border-blue-100 whitespace-nowrap text-sm font-medium bg-white text-blue-500">
+                    {medicamento.disponibilidad}
                   </td>
                 </tr>
               ))
             ) : (
               <tr>
                 <td
-                  colSpan="7"
-                  className="px-6 py-4 whitespace-nowrap text-center text-gray-500"
+                  colSpan="4"
+                  className="px-6 py-4 whitespace-nowrap text-center bg-white text-blue-500"
                 >
                   No hay medicamentos registrados
                 </td>

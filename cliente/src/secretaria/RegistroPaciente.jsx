@@ -57,7 +57,7 @@ const RegistroPaciente = () => {
 
   return (
     <div className="mt-20">
-      <div className="bg-white rounded-xl flex flex-col items-center justify-center w-3/5 mx-auto p-14 shadow-md mt-4 mb-4">
+      <div className="bg-white rounded-xl flex flex-col items-center justify-center w-3/5 mx-auto p-14 shadow-2xl shadow-blue-200 mt-4 mb-4">
         <h2 className="text-blue-500 text-3xl font-bold mb-4">
           Formulario de Registro de Paciente
         </h2>
@@ -98,7 +98,7 @@ const RegistroPaciente = () => {
         </div>
         <div className="text-center mt-4">
           <button
-            className="mt-4 px-8 py-2 text-white bg-green-500 rounded hover:bg-green-700 focus:outline-none focus:shadow-outline-green active:bg-green-800"
+            className="mt-4 px-8 py-2 text-white bg-blue-500 rounded hover:bg-blue-700 focus:outline-none focus:shadow-outline-green active:bg-green-800"
             onClick={handleRegistro}
           >
             Registrar

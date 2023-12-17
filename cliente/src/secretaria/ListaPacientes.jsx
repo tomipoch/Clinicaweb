@@ -1,206 +1,155 @@
 import React, { useState, useEffect } from "react";
-const CitasMedico = () => {
-  const [citas, setCitas] = useState([]);
-  const [citasEditando, setCitasEditando] = useState({
-    id: null,
-    nombre: '',
-    apellido: '',
-    email: '',
-    ciudad: '',
-    telefono: '',
-    mensaje: '',
-    index: null,
-  });
+import axiosInstance from "../config/axiosConfig";
 
-  const agregarCita = () => {
-    const nuevaCita = {
-      id: citas.length + 1, // Usar un ID único
-      nombre: 'Matias',
-      apellido: 'Varas',
-      email: 'xxx@gmail.com',
-      ciudad: 'talca',
-      telefono: '9898999',
-      mensaje: 'Mensaje de clinica oftalmologica',
-    };
+const ListaPacientes = () => {
+  const [contacts, setContacts] = useState([]);
+  const [selectedContact, setSelectedContact] = useState(null);
+  const [isEditing, setIsEditing] = useState(false);
 
-    setCitas([...citas, nuevaCita]);
-  };
+  useEffect(() => {
+    axiosInstance
+      .get("/secretaria/pacientes")
+      .then((response) => {
+        if (Array.isArray(response.data)) {
+          setContacts(response.data);
+        } else {
+          console.error("La respuesta no es un arreglo");
+          setContacts([]);
+        }
+      })
+      .catch((error) => {
+        console.error("Error al obtener datos:", error);
+        setContacts([]);
+      });
+  }, []);
 
-  const editarCitas = (index) => {
-    const citaEnEdicion = citas[index];
-    setCitasEditando({ ...citaEnEdicion, index });
-  };
+  // Función para manejar la edición de un paciente
+  function handleEdit(rutPaciente) {
+    const pacienteParaEditar = contacts.find(
+      (contact) => contact[0] === rutPaciente
+    );
+    setSelectedContact(pacienteParaEditar);
+    setIsEditing(true);
+  }
 
-  const manejarCambioCampo = (campo, valor) => {
-    setCitasEditando((prevCitasEditando) => ({
-      ...prevCitasEditando,
-      [campo]: valor,
-    }));
-  };
+  // Función para cerrar el modal de edición o el estado de edición
+  function handleCloseEdit() {
+    setIsEditing(false);
+  }
 
-  const guardarEdicion = () => {
-    const nuevaCita = [...citas];
-    nuevaCita[citasEditando.index] = { ...citasEditando };
-    setCitas(nuevaCita);
-    cancelarEdicion();
-  };
+  // Función para actualizar los datos de un paciente
+  function handleUpdateContact(updatedData) {
+    axiosInstance
+      .put(`/secretaria/paciente/${updatedData.rut}`, updatedData)
+      .then((response) => {
+        const updatedContacts = contacts.map((contact) =>
+          contact[0] === updatedData.rut ? updatedData : contact
+        );
+        setContacts(updatedContacts);
+        setIsEditing(false);
+      })
+      .catch((error) => {
+        console.error("Error al actualizar el paciente:", error);
+      });
+  }
 
-  const cancelarEdicion = () => {
-    setCitasEditando({
-      id: null,
-      nombre: '',
-      apellido: '',
-      email: '',
-      ciudad: '',
-      telefono: '',
-      mensaje: '',
-      index: null,
-    });
-  };
-
-  const eliminarCita = (index) => {
-    const nuevaCita = citas.filter((_, i) => i !== index);
-    setCitas(nuevaCita);
-    cancelarEdicion();
-  };
+  // Función para eliminar un paciente
+  function handleDelete(contactIndex) {
+    const rut = contacts[contactIndex][0];
+    axiosInstance
+      .delete(`/secretaria/pacientes/`, { data: { rut: rut } })
+      .then(() => {
+        const updatedContacts = contacts.filter(
+          (_, index) => index !== contactIndex
+        );
+        setContacts(updatedContacts);
+      })
+      .catch((error) => {
+        console.error("Error al eliminar paciente:", error);
+      });
+  }
 
   return (
     <div className="flex justify-center items-center h-screen flex-col mt-1">
       <h1 className="text-3xl text-blue-500 font-bold mb-8">Lista de Pacientes</h1>
-      <div className='flex flex-row gap-2'>
-        <button onClick={agregarCita} className='bg-green-500 text-white shadow-2xl shadow-green-500 flex items-center gap-2 py-2 px-4 mb-10 rounded-lg hover'>
-          Agregar
-        </button>
-      </div>
-      <div className="overflow-x-auto shadow-2xl shadow-blue-300 rounded-2xl">
-        <table className='w-full rounded-2xl table-auto'>
-          <thead className='bg-blue-500 text-white'>
-            <tr>
-              <th className='p-2'>ID</th>
-              <th className='p-2'>Nombre</th>
-              <th className='p-2'>Apellido</th>
-              <th className='p-2'>Email</th>
-              <th className='p-2'>Ciudad</th>
-              <th className='p-2'>Telefono</th>
-              <th className='p-2'>Mensaje</th>
-              <th className='p-2'>Acciones</th>
-            </tr>
-          </thead>
-          <tbody>
-            {citas.map((cita, index) => (
-              <tr key={index}>
-                <td className='p-2 bg-white text-blue-500'>
-                  {citasEditando.index === index ? (
-                    <input
-                      type='text'
-                      value={citasEditando.id}
-                      onChange={(e) => manejarCambioCampo('id', e.target.value)}
-                      className='p-2 w-full border rounded bg-transparent'
-                    />
-                  ) : (
-                    cita.id
-                )}
+    <div className="overflow-x-auto rounded-2xl shadow-2xl shadow-blue-200">
+      <table className="min-w-full leading-normal bg-white border border-gray-200">
+        <thead className="bg-blue-500">
+          <tr>
+            <th className="px-6 py-3 text-left text-xs font-medium text-white uppercase tracking-wider">
+              RUT
+            </th>
+            <th className="px-6 py-3 text-left text-xs font-medium text-white uppercase tracking-wider">
+              nombre
+            </th>
+            <th className="px-6 py-3 text-left text-xs font-medium text-white uppercase tracking-wider">
+              apellido Paterno
+            </th>
+            <th className="px-6 py-3 text-left text-xs font-medium text-white uppercase tracking-wider">
+              apellido Materno
+            </th>
+            <th className="px-6 py-3 text-left text-xs font-medium text-white uppercase tracking-wider">
+              Fecha Nacimiento
+            </th>
+            <th className="px-6 py-3 text-left text-xs font-medium text-white uppercase tracking-wider">
+              Contacto
+            </th>
+            <th className="px-6 py-3 text-left text-xs font-medium text-white uppercase tracking-wider">
+              Direccion
+            </th>
+            <th className="px-6 py-3 text-left text-xs font-medium text-white uppercase tracking-wider">
+              Acciones
+            </th>
+          </tr>
+        </thead>
+        <tbody className="bg-white divide-y divide-gray-200">
+          {contacts.map((contact, index) => (
+            <tr key={index}>
+              <td className="px-6 text-blue-500 py-4 whitespace-nowrap">
+                {contact[0]}
               </td>
-              <td className='p-2 bg-white text-blue-500'>
-                {citasEditando.index === index ? (
-                  <input
-                    type='text'
-                    value={citasEditando.nombre}
-                    onChange={(e) => manejarCambioCampo('nombre', e.target.value)}
-                    className='p-2 w-full border rounded bg-transparent'
-                  />
-                ) : (
-                  cita.nombre
-                )}
+              <td className="px-6 py-4 text-blue-500 whitespace-nowrap">
+                {contact[1]}
               </td>
-              <td className='p-2 bg-white text-blue-500'>
-                {citasEditando.index === index ? (
-                  <input
-                    type='text'
-                    value={citasEditando.apellido}
-                    onChange={(e) => manejarCambioCampo('apellido', e.target.value)}
-                    className='p-2 w-full border rounded bg-transparent'
-                  />
-                ) : (
-                  cita.apellido
-                )}
+              <td className="px-6 py-4 text-blue-500 whitespace-nowrap">
+                {contact[2]}
               </td>
-              <td className='p-2 bg-white text-blue-500'>
-                {citasEditando.index === index ? (
-                  <input
-                    type='text'
-                    value={citasEditando.email}
-                    onChange={(e) => manejarCambioCampo('email', e.target.value)}
-                    className='p-2 w-full border rounded bg-transparent'
-                  />
-                ) : (
-                  cita.email
-                )}
+              <td className="px-6 py-4 text-blue-500 whitespace-nowrap">
+                {contact[3]}
               </td>
-              <td className='p-2 bg-white text-blue-500'>
-                {citasEditando.index === index ? (
-                  <input
-                    type='text'
-                    value={citasEditando.ciudad}
-                    onChange={(e) => manejarCambioCampo('ciudad', e.target.value)}
-                    className='p-2 w-full border rounded bg-transparent'
-                  />
-                ) : (
-                  cita.ciudad
-                )}
+              <td className="px-6 py-4 text-blue-500 whitespace-nowrap">
+                {new Date(contact[4]).toLocaleDateString("es-ES")}
               </td>
-              <td className='p-2 bg-white text-blue-500'>
-                {citasEditando.index === index ? (
-                  <input
-                    type='text'
-                    value={citasEditando.telefono}
-                    onChange={(e) => manejarCambioCampo('telefono', e.target.value)}
-                    className='p-2 w-full border rounded bg-transparent'
-                  />
-                ) : (
-                  cita.telefono
-                )}
+
+              <td className="px-6 py-4 text-blue-500 whitespace-nowrap">
+                {contact[5]}
               </td>
-              <td className='p-2 bg-white text-blue-500'>
-                {citasEditando.index === index ? (
-                  <input
-                    type='text'
-                    value={citasEditando.mensaje}
-                    onChange={(e) => manejarCambioCampo('mensaje', e.target.value)}
-                    className='p-2 w-full border rounded bg-transparent'
-                  />
-                ) : (
-                  cita.mensaje
-                )}
+              <td className="px-6 py-4 text-blue-500 whitespace-nowrap">
+                {contact[6]}
               </td>
-              <td className='p-2 bg-white flex justify-end'>
-                {citasEditando.index === index ? (
-                  <>
-                    <button className='bg-green-500 text-white py-1 px-2 rounded-lg mr-2' onClick={guardarEdicion}>
-                      Guardar
-                    </button>
-                    <button className='bg-gray-400 text-green py-1 px-2 rounded-lg ' onClick={cancelarEdicion}>
-                      Cancelar
-                    </button>
-                  </>
-                ) : (
-                  <>
-                    <button className='bg-blue-500 text-white py-1 px-2 rounded-lg mr-2 ' onClick={() => editarCitas(index)}>
-                      Editar
-                    </button>
-                    <button className='bg-red-500 text-white py-1 px-2 rounded-lg mr-2' onClick={() => eliminarCita(index)}>
-                       Eliminar
-                    </button>
-                  </>
-                )}
+              <td className="px-6 py-4 text-blue-500 whitespace-nowrap">
+                <button
+                  onClick={() => handleEdit(contact[0])} // Asumiendo que contact[0] es el RUT del paciente
+                  className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
+                >
+                  Editar
+                </button>
+                <button
+                  onClick={() => {
+                    handleDelete(index);
+                  }}
+                  className="bg-red-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded"
+                >
+                  Borrar
+                </button>
               </td>
             </tr>
           ))}
         </tbody>
       </table>
-      </div>
+    </div>
     </div>
   );
 };
 
-export default CitasMedico;
+export default ListaPacientes;

@@ -16,8 +16,9 @@ import AgendarCita from "./secretaria/AgendarCita";
 import PanelPacientes from "./secretaria/PanelPacientes";
 import DetalleDePaciente from "./secretaria/DetalleDePaciente";
 import RegistroPaciente from "./secretaria/RegistroPaciente";
-import Horarios from "./secretaria/Horarios";
-
+import RegistrarMedico from "./secretaria/registarMedico";
+import RegistrarAuxialar from "./secretaria/registrarAux";
+import ConsultaHistorialPaciente from "./medico/consultaHistorial";
 // Medico
 import DiseñoMedico from "./layouts/DisenoMedico";
 import PanelMedico from "./medico/PanelMedico";
@@ -32,24 +33,26 @@ function App() {
       <Routes>
         <Route path="/login" element={<Login />} />
         {/* Layout Secretaria */}
-        <Route path='/*' element={<DisenoSecretaria />}>
+        <Route path="/*" element={<DisenoSecretaria />}>
           <Route index element={<PanelControl />} />
           <Route path="citas" element={<PanelCitas />} />
+          <Route path="registrar/medico" element={<RegistrarMedico />} />
+          <Route path="registrar/auxiliar" element={<RegistrarAuxialar />} />
           <Route path="pacientes" element={<PanelPacientes />} />
           <Route path="citas/lista" element={<ListaCitas />} />
           <Route path="citas/agendar" element={<AgendarCita />} />
-          <Route path="pacientes/lista" element={<ListaPacientes />} />
+          <Route path="pacientes/listado" element={<ListaPacientes />} />
           <Route path="pacientes/registro" element={<RegistroPaciente />} />
           <Route path="paciente/:id" element={<DetalleDePaciente />} />
-          <Route path="horarios" element={<Horarios />} />
         </Route>
         {/* Layout Medico */}
-        <Route path='/medico/*' element={<DiseñoMedico/>}>
-          <Route index element={<PanelMedico/>} />
-          <Route path="citas-medico" element={<CitasMedico/>} />
-          <Route path="equipo-medico" element={<EquipoMedico/>} />
-          <Route path="diagnostico" element={<Diagnostico/>} />
-          <Route path="medicamentos" element={<Medicamentos/>} />
+        <Route path="/medico/*" element={<DiseñoMedico />}>
+          <Route index element={<PanelMedico />} />
+          <Route path="historial" element={<ConsultaHistorialPaciente />} />
+          <Route path="citas-medico" element={<CitasMedico />} />
+          <Route path="equipo-medico" element={<EquipoMedico />} />
+          <Route path="diagnostico" element={<Diagnostico />} />
+          <Route path="medicamentos" element={<Medicamentos />} />
         </Route>
       </Routes>
     </BrowserRouter>

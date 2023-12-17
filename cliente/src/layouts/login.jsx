@@ -29,8 +29,8 @@ function Login() {
         // Redirigir según el rol del usuario
         if (rol === "secretaria") {
           navigate("/PanelControl");
-        } else if (rol === "usuario") {
-          navigate("/PanelPacientes");
+        } else if (rol === "medico") {
+          navigate("/medico/");
         } else {
           navigate("/"); // Redirigir a una página predeterminada para otros roles
         }
