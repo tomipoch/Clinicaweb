@@ -16,7 +16,7 @@ Este proyecto es una aplicación web diseñada para gestionar y optimizar los pr
 
 ## Tecnologías Utilizadas
 
-- **Frontend:** HTML, CSS, JavaScript, React.js
+- **Frontend:** HTML, CSS, Tailwind CSS, JavaScript, React.js, Vite
 
 - **Backend:** Node.js, Express.js
 
